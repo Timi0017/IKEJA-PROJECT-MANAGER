@@ -56,4 +56,4 @@ def create_db_and_tables():
 # This runs the creation function if you run this file directly
 if __name__ == "__main__":
     create_db_and_tables()
-    print("Enterprise Database and Tables created successfully!")
+    print("Enterprise Database and Tables created successfully")
