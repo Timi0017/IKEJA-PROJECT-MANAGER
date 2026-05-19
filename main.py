@@ -68,6 +68,7 @@ def get_session():
 class UserCreate(BaseModel):
     username: str
     password: str
+
 @app.post("/register", status_code=status.HTTP_201_CREATED)
 def register_user(user: UserCreate, session: Session = Depends(get_session)):
     
@@ -163,18 +164,20 @@ def read_users_me(current_user: User = Depends(get_current_user)):
     }
 
 # --- Work space module --- 
+class ProjectCreate(BaseModel):
+    name: str
+    description: str = None
 @app.post("/projects", status_code=status.HTTP_201_CREATED)
 def create_project(
-    name: str,
-    description: str = None,
+    project_data: ProjectCreate,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user) #bouncer(middleware)
 ):
     # create the new project using the data the user typed in(name, description)
     # for the owner_id we secretly pull the exact ID from the verified token
     new_project = Project(
-        name=name,
-        description=description,
+        name=project_data.name,
+        description=project_data.description,
         owner_id=current_user.id
     )
 
@@ -195,6 +198,7 @@ def create_project(
         "message": f"Project '{new_project.name}' created and Admin access granted.", 
         "project": new_project
     }
+
 @app.get("/projects")
 def get_user_project(
     session: Session = Depends(get_session),

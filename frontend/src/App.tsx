@@ -22,6 +22,15 @@ function App() {
                     } 
                 />
 
+                {/* <Route
+                    path="/projects/:projectId"
+                    element={
+                        <ProtectedRoute>
+                            <ProjectBoard />
+                        </ProtectedRoute>
+                    }
+                /> */}
+
                 {/* Default redirect */}
                 <Route path="*" element={<Navigate to="/login" />} />
             </Routes>
