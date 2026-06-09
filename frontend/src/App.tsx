@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProjectBoard from "./pages/ProjectBoard";
 
 function App() {
     return (
@@ -22,14 +23,14 @@ function App() {
                     } 
                 />
 
-                {/* <Route
+                { <Route
                     path="/projects/:projectId"
                     element={
                         <ProtectedRoute>
                             <ProjectBoard />
                         </ProtectedRoute>
                     }
-                /> */}
+                /> }
 
                 {/* Default redirect */}
                 <Route path="*" element={<Navigate to="/login" />} />
