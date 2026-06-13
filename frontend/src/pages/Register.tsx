@@ -25,38 +25,49 @@ export default function Register() {
     };
 
     return (
-        <div className="flex h-screen items-center justify-center bg-gray-100">
-            <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
-                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Create Workspace Account</h2>
-                <form onSubmit={handleRegister} className="space-y-4">
-                    <input 
-                        type="text" 
-                        placeholder="Username" 
-                        value={username} 
-                        onChange={(e) => setUsername(e.target.value)} 
-                        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
-                    <input 
-                        type="password" 
-                        placeholder="Password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} 
-                        className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    />
+        <div className="flex min-h-screen items-center justify-center bg-[#F5F5F7] font-sans p-4">
+            <div className="w-full max-w-md bg-white p-10 rounded-[2rem] shadow-xl border border-gray-100 transition-all">
+                
+                <div className="mb-8 text-center">
+                    <h2 className="text-3xl font-semibold tracking-tight text-gray-900 mb-2">Create Account</h2>
+                    <p className="text-sm text-gray-500">Join your team's workspace today.</p>
+                </div>
+
+                <form onSubmit={handleRegister} className="space-y-5">
+                    <div>
+                        <input 
+                            type="text" 
+                            placeholder="Username" 
+                            value={username} 
+                            onChange={(e) => setUsername(e.target.value)} 
+                            className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-gray-900 placeholder-gray-400"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <input 
+                            type="password" 
+                            placeholder="Password" 
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
+                            className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-gray-900 placeholder-gray-400"
+                            required
+                        />
+                    </div>
                     <button 
                         type="submit" 
-                        className="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700 transition duration-200"
+                        className="w-full bg-blue-600 text-white font-medium text-lg py-3.5 rounded-xl hover:bg-blue-700 shadow-sm hover:shadow-md transition-all cursor-pointer mt-2"
                     >
                         Register
                     </button>
                 </form>
-                <div className="mt-4 text-center">
-                    <Link to="/login" className="text-sm text-blue-600 hover:underline">
-                        Already have an account? Log in here.
+
+                <div className="mt-8 text-center">
+                    <Link to="/login" className="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+                        Already have an account? <span className="text-blue-600">Log in</span>
                     </Link>
                 </div>
+
             </div>
         </div>
     );

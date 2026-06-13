@@ -52,18 +52,18 @@ export default function Dashboard() {
     };
 
    return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <div className="min-h-screen bg-[#F5F5F7] p-8 font-sans text-gray-900">
             {/* Header Area */}
             <div className="max-w-6xl mx-auto flex justify-between items-center mb-10">
-                <h1 className="text-3xl font-bold text-gray-800">My Workspaces</h1>
-                <div className="space-x-4">
+                <h1 className="text-3xl font-semibold tracking-tight">My Workspaces</h1>
+                <div className="flex items-center space-x-4">
                     <button 
                         onClick={() => setIsModalOpen(true)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition"
+                        className="bg-blue-600 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-blue-700 transition shadow-sm cursor-pointer"
                     >
                         + New Project
                     </button>
-                    <button onClick={handleLogout} className="text-gray-500 hover:text-red-500">
+                    <button onClick={handleLogout} className="text-sm font-medium text-gray-500 hover:text-red-500 transition cursor-pointer">
                         Logout
                     </button>
                 </div>
@@ -72,17 +72,19 @@ export default function Dashboard() {
             {/* Projects Grid Area */}
             <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {projects.length === 0 ? (
-                    <p className="text-gray-500 italic col-span-full">You have no projects yet. Create one to get started!</p>
+                    <div className="col-span-full flex flex-col items-center justify-center p-12 bg-white rounded-2xl border border-gray-200 border-dashed">
+                        <p className="text-gray-500 text-center">You have no projects yet. Create one to get started!</p>
+                    </div>
                 ) : (
                     projects.map((project) => (
-                        <div key={project.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between h-48">
+                        <div key={project.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/60 flex flex-col justify-between h-48 hover:shadow-md transition-shadow group">
                             <div>
-                                <h3 className="text-xl font-bold text-gray-800 mb-2">{project.name}</h3>
-                                <p className="text-gray-500 text-sm line-clamp-2">{project.description}</p>
+                                <h3 className="text-xl font-semibold text-gray-800 mb-2">{project.name}</h3>
+                                <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">{project.description}</p>
                             </div>
                             <button 
                                 onClick={() => navigate(`/projects/${project.id}`)}
-                                className="mt-4 w-full bg-gray-100 text-gray-700 font-semibold py-2 rounded hover:bg-gray-200 transition"
+                                className="mt-4 w-full bg-gray-50 text-blue-600 font-medium py-2.5 rounded-xl hover:bg-blue-50 transition group-hover:bg-blue-50 cursor-pointer"
                             >
                                 View Project
                             </button>
@@ -91,42 +93,44 @@ export default function Dashboard() {
                 )}
             </div>
 
-            {/* Create Project Modal (Hidden by default) */}
+            {/* Create Project Modal (Apple/Google Style) */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white p-8 rounded-lg w-full max-w-md">
-                        <h2 className="text-2xl font-bold mb-6 text-gray-800">Create New Project</h2>
-                        <form onSubmit={handleCreateProject} className="space-y-4">
+                <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
+                        <h2 className="text-2xl font-semibold mb-6 text-gray-900 tracking-tight">Create New Project</h2>
+                        <form onSubmit={handleCreateProject} className="space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Project Name</label>
                                 <input 
                                     type="text" 
                                     value={newProjectName}
                                     onChange={(e) => setNewProjectName(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none"
                                     required
+                                    placeholder="e.g. Website Redesign"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
                                 <textarea 
                                     value={newProjectDesc}
                                     onChange={(e) => setNewProjectDesc(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none resize-none"
                                     rows={3}
+                                    placeholder="What is this project about?"
                                 />
                             </div>
-                            <div className="flex justify-end space-x-3 mt-6">
+                            <div className="flex justify-end space-x-3 mt-8 pt-2">
                                 <button 
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="px-4 py-2 text-gray-500 hover:text-gray-800"
+                                    className="px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition cursor-pointer"
                                 >
                                     Cancel
                                 </button>
                                 <button 
                                     type="submit"
-                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                    className="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-sm transition cursor-pointer"
                                 >
                                     Create Workspace
                                 </button>
