@@ -84,10 +84,11 @@ export default function ProjectBoard() {
         title: newTask.title,
         description: newTask.description,
         priority: newTask.priority,
-        status: "To-Do"
+        status: "To-Do",
+        project_id: parseInt(projectId || "0", 10)
       });
       
-      setTasks(prevTasks => [...prevTasks, response.data]);
+      setTasks(prevTasks => [...prevTasks, response.data.task || response.data]);
 
       setIsModalOpen(false);
       setNewTask({ title: "", description: "", priority: "Low" });

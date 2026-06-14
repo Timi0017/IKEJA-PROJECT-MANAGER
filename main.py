@@ -167,6 +167,19 @@ def read_users_me(current_user: User = Depends(get_current_user)):
 class ProjectCreate(BaseModel):
     name: str
     description: str = None
+
+class TaskCreate(BaseModel):
+    title: str
+    project_id: int
+    description: str = None
+    status: str = "To-Do"
+    priority: str = "Medium"
+
+class TaskUpdate(BaseModel):
+    title: str = None
+    task_status: str = None
+    priority: str = None
+
 @app.post("/projects", status_code=status.HTTP_201_CREATED)
 def create_project(
     project_data: ProjectCreate,
@@ -279,11 +292,7 @@ def delete_project(
 
 @app.post("/tasks", status_code=status.HTTP_201_CREATED)
 def create_task(
-    title: str,
-    project_id: int, #to know which project the task belongs to
-    description: str = None,
-    task_status: str = "To-Do", #Renamed slightly to avoid python keyword conflicts
-    priority: str = "Medium",
+    task_data: TaskCreate,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user) #the bouncer
 ):
@@ -300,11 +309,11 @@ def create_task(
     
     #task creation
     new_task = Task(
-        title=title,
-        description=description,
-        status=task_status,
-        priority=priority,
-        project_id=project_id,
+        title=task_data.title,
+        description=task_data.description,
+        status=task_data.task_status,
+        priority=task_data.priority,
+        project_id=task_data.project_id,
         assignee_id=current_user.id
     )
 
@@ -344,9 +353,7 @@ def get_project_tasks(
 @app.put("/tasks/{task_id}")
 def update_task(
     task_id: int,
-    title: str = None,
-    task_status: str = None,
-    priority: str = None,
+    task_data: TaskUpdate,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):
@@ -368,12 +375,12 @@ def update_task(
         )
     
     #update the fields if the user provided them
-    if title:
-        task.title = title
-    if task_status:
-        task.status = task_status
-    if priority:
-        task.priority = priority
+    if task_data.title:
+        task.title = task_data.title
+    if task_data.task_status:
+        task.status = task_data.task_status
+    if task_data.priority:
+        task.priority = task_data.priority
 
     #save the changes to the database
     session.add(task)
