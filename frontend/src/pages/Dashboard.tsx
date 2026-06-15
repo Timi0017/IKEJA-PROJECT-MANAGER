@@ -45,6 +45,27 @@ export default function Dashboard() {
         }
     };
 
+    const handleDeleteProject = async (projectId: number) => {
+        // Safety First: Always confirm destructive actions
+        if (!window.confirm("Are you sure you want to delete this project? This action cannot be undone.")) {
+            return;
+        }
+
+        try {
+            await api.delete(`/projects/${projectId}`);
+            // Optimistically remove the project from the UI immediately
+            setProjects(prevProjects => prevProjects.filter(p => p.id !== projectId));
+        } catch (err: any) {
+            // Catch the specific 403 Forbidden error from your FastAPI backend
+            if (err.response && err.response.status === 403) {
+                alert("You are not authorized to delete this project. Only the creator can do this.");
+            } else {
+                alert("An error occurred while trying to delete the project.");
+                console.error("Delete error:", err);
+            }
+        }
+    };
+
     //logout handler
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -76,20 +97,37 @@ export default function Dashboard() {
                         <p className="text-gray-500 text-center">You have no projects yet. Create one to get started!</p>
                     </div>
                 ) : (
-                    projects.map((project) => (
-                        <div key={project.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/60 flex flex-col justify-between h-48 hover:shadow-md transition-shadow group">
-                            <div>
-                                <h3 className="text-xl font-semibold text-gray-800 mb-2">{project.name}</h3>
-                                <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">{project.description}</p>
-                            </div>
-                            <button 
-                                onClick={() => navigate(`/projects/${project.id}`)}
-                                className="mt-4 w-full bg-gray-50 text-blue-600 font-medium py-2.5 rounded-xl hover:bg-blue-50 transition group-hover:bg-blue-50 cursor-pointer"
-                            >
-                                View Project
-                            </button>
+                   projects.map((project) => (
+                    // Notice the 'relative' class added here
+                    <div key={project.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/60 flex flex-col justify-between h-48 hover:shadow-md transition-shadow group relative">
+                        
+                        {/* Delete Bin Icon (Only shows on hover) */}
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation(); // Prevents the click from accidentally triggering anything else
+                                handleDeleteProject(project.id);
+                            }}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+                            title="Delete Project"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+
+                        <div>
+                            {/* Added pr-8 (padding-right) so long titles don't slide under the delete button */}
+                            <h3 className="text-xl font-semibold text-gray-800 mb-2 pr-8">{project.name}</h3>
+                            <p className="text-gray-500 text-sm line-clamp-2 leading-relaxed">{project.description}</p>
                         </div>
-                    ))
+                        <button 
+                            onClick={() => navigate(`/projects/${project.id}`)}
+                            className="mt-4 w-full bg-gray-50 text-blue-600 font-medium py-2.5 rounded-xl hover:bg-blue-50 transition group-hover:bg-blue-50 cursor-pointer"
+                        >
+                            View Project
+                        </button>
+                    </div>
+                ))
                 )}
             </div>
 

@@ -218,18 +218,26 @@ def get_user_project(
     current_user: User = Depends(get_current_user) #bouncer(middleware) is checking the wristband(auhorization)
 ):
     
-    #ask the database to select al projects
-    # where the project's owner_id exactly matches our verified user's ID
-    statement = select(Project).where(Project.owner_id == current_user.id)
+   # 1. First, ask the junction table (ProjectMember) for every VIP pass this user owns
+    membership_statement = select(ProjectMember).where(ProjectMember.user_id == current_user.id)
+    user_memberships = session.exec(membership_statement).all()
 
-    #fetch all matching results as a list
-    user_projects = session.exec(statement).all()
+    # 2. Extract just the project IDs from those passes
+    project_ids = [membership.project_id for membership in user_memberships]
 
-    #return the list to the frontend
+    # 3. If they have no passes, return an empty list immediately
+    if not project_ids:
+        return {"message": f"No workspaces found for {current_user.username}", "projects": []}
+
+    # 4. Fetch the actual Project details for all the IDs on their VIP list
+    # .in_() checks if the Project's ID is inside our list of authorized project_ids
+    project_statement = select(Project).where(Project.id.in_(project_ids))
+    authorized_projects = session.exec(project_statement).all()
+
     return {
-        "message": f"Found {len(user_projects)} workspaces for {current_user.username}",
-        "projects": user_projects
-    }
+        "message": f"Found {len(authorized_projects)} workspaces for {current_user.username}",
+        "projects": authorized_projects
+    }   
 
 @app.put("/projects/{project_id}")
 def update_project(
@@ -296,7 +304,7 @@ def create_task(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user) #the bouncer
 ):
-    statement = select(Project).where(Project.id == project_id)
+    statement = select(Project).where(Project.id == task_data.project_id)
     project = session.exec(statement).first()
 
     # a check if the project exists
@@ -311,7 +319,7 @@ def create_task(
     new_task = Task(
         title=task_data.title,
         description=task_data.description,
-        status=task_data.task_status,
+        status=task_data.status,
         priority=task_data.priority,
         project_id=task_data.project_id,
         assignee_id=current_user.id
@@ -470,3 +478,36 @@ def invite_user_to_project(
     session.commit()
 
     return {"message": f"Successfully added {invitee.username} to the project as a {role}"}
+
+@app.get("/projects/{project_id}/members")
+def get_project_members(
+    project_id: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    # Check if the user making the request is actually in the project
+    vip_pass = session.exec(
+        select(ProjectMember).where(
+            ProjectMember.project_id == project_id,
+            ProjectMember.user_id == current_user.id
+        )
+    ).first()
+
+    if not vip_pass:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not have access to this workspace")
+    
+    # Fetch all member links for this project
+    members_link = session.exec(select(ProjectMember).where(ProjectMember.project_id == project_id)).all()
+    
+    # Match the user IDs to their actual usernames
+    team = []
+    for link in members_link:
+        user = session.exec(select(User).where(User.id == link.user_id)).first()
+        if user:
+            team.append({
+                "id": user.id,
+                "username": user.username,
+                "role": link.role
+            })
+            
+    return {"members": team}
